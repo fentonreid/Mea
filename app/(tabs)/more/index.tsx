@@ -4,22 +4,26 @@ import { SettingItem_ActionStyle } from "@/models/enums/SettingItem_ActionStyle"
 import { SettingItem_BorderStyle } from "@/models/enums/SettingItem_BorderStyle";
 import { useRouter } from "expo-router";
 import {
-  ArrowsLeftRight,
   GearSix,
   LockKey,
   SignOut,
   User,
   UserList,
 } from "phosphor-react-native";
-import { Platform, ScrollView, Text, View } from "react-native";
+import { Platform, ScrollView, View } from "react-native";
 import Constants from "expo-constants";
 import { Text_Input } from "@/components/TextStyles";
 import Spacings from "@/constants/Spacings";
-import { useUser } from "@realm/react";
+import { useSystem } from "@/powersync/PowerSync";
 
 const SettingsScreen = () => {
   const router = useRouter();
-  const user = useUser();
+  const { supabaseConnector, powersync } = useSystem();
+
+  const onSignOut = async () => {
+    await powersync.disconnectAndClear();
+    await supabaseConnector.client.auth.signOut();
+  };
 
   return (
     <ScrollView contentContainerStyle={LayoutStyles.settingListScrollView}>
@@ -54,7 +58,7 @@ const SettingsScreen = () => {
           BorderStyle={SettingItem_BorderStyle.SINGLE}
           Action={{
             type: SettingItem_ActionStyle.NONE,
-            OnPress: () => user.logOut(),
+            OnPress: onSignOut,
           }}
         />
       </View>

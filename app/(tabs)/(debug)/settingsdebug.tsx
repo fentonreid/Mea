@@ -2,11 +2,16 @@ import { View, Switch, TouchableOpacity } from "react-native";
 import * as CT from "@/components/TextStyles";
 import { useContext } from "react";
 import { SettingsContext, storage } from "@/store/SettingsContext";
-import { useUser } from "@realm/react";
+import { useSystem } from "@/powersync/PowerSync";
 
 const SettingsScreen = () => {
   const settingsContext = useContext(SettingsContext);
-  const user = useUser();
+  const { supabaseConnector, powersync } = useSystem();
+
+  const onSignOut = async () => {
+    await powersync.disconnectAndClear();
+    await supabaseConnector.client.auth.signOut();
+  };
 
   const fetchAllItems = () => {
     const allKeys = storage.getAllKeys();
@@ -24,9 +29,7 @@ const SettingsScreen = () => {
   return (
     <View style={{ gap: 24 }}>
       <TouchableOpacity
-        onPress={() => {
-          user.logOut();
-        }}
+        onPress={onSignOut}
         style={{
           flexDirection: "row",
           justifyContent: "space-between",

@@ -31,15 +31,15 @@ const TabBarLabel = ({ focused, label, colours }: any) => {
   );
 };
 
-const MainTabLayout = () => {
+const MainTabLayout = async () => {
   const { colours } = useContext(SettingsContext);
 
-  const activeMealRoutine = MealRoutineStateManager({});
+  const activeMealRoutine = await MealRoutineStateManager({});
 
   let mealRoutineState =
     activeMealRoutine === null
       ? MealRoutineState.ACTIVE_MEAL_ROUTINE_NULL
-      : (activeMealRoutine.mealRoutineState as MealRoutineState);
+      : (activeMealRoutine as MealRoutineState);
 
   let isMealRoutineCreateMode =
     mealRoutineState != MealRoutineState.VIEWING &&

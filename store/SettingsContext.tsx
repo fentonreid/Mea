@@ -29,6 +29,7 @@ export const SettingsContext = createContext<SettingsContextModel>({
     tabUnselected: "",
     darkPrimary: "",
     darkAccent: "",
+    lightPrimary: "",
   },
 
   toggleNotifications: (_) => {},

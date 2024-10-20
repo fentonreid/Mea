@@ -1,15 +1,17 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import { useQuery } from "@realm/react";
-import { Meals } from "@/models/schemas/Schemas";
 import { RangeSlider } from "@react-native-assets/slider";
 import { useState } from "react";
+import { useSystem } from "@/powersync/PowerSync";
+import { RECIPES_TABLE } from "@/powersync/AppSchema";
 
 const CustomThumb = ({ value }: any) => {
   return <Text>{value}</Text>;
 };
 
-const Screen = () => {
-  const meals = useQuery<Meals>("Meals");
+const Screen = async () => {
+  const { db } = useSystem();
+
+  const meals = await db.selectFrom(RECIPES_TABLE).selectAll().execute();
   const [range, setRange] = useState<[number, number]>([0, 0]);
 
   return (
@@ -27,14 +29,12 @@ const Screen = () => {
         outboundColor="blue"
         inboundColor="red"
       />
-      {/* <Text>Meals Screen</Text>
+      <Text>Meals Screen</Text>
       <FlatList
         data={meals}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => (
-          <Text>{`${item.name} - ${item.ingredients[0].ingredient}`}</Text>
-        )}
-      /> */}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <Text>{`${item.name}`}</Text>}
+      />
     </View>
   );
 };

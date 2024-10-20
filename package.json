@@ -15,10 +15,12 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@gorhom/bottom-sheet": "^4.6.3",
+    "@powersync/kysely-driver": "^0.4.2",
+    "@powersync/react-native": "^1.14.1",
     "@react-native-assets/slider": "^7.0.0",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^6.0.2",
-    "@realm/react": "^0.7.0",
+    "@supabase/supabase-js": "^2.45.4",
     "@types/moment": "^2.13.0",
     "expo": "^51.0.5",
     "expo-constants": "~16.0.1",
@@ -49,8 +51,7 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "^15.2.0",
     "react-native-svg-transformer": "^1.4.0",
-    "react-native-web": "~0.19.6",
-    "realm": "^12.9.0"
+    "react-native-web": "~0.19.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

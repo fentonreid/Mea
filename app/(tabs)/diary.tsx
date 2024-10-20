@@ -1,10 +1,13 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import { useQuery } from "@realm/react";
-import { Ingredients } from "@/models/schemas/Schemas";
+import { useSystem } from "@/powersync/PowerSync";
+import { GENERAL_INGREDIENTS_TABLE } from "@/powersync/AppSchema";
 
-const Screen = () => {
-  //const realm = useRealm();
-  const ingredients = useQuery<Ingredients>("Ingredients");
+const Screen = async () => {
+  const { db } = useSystem();
+  const ingredients = await db
+    .selectFrom(GENERAL_INGREDIENTS_TABLE)
+    .selectAll()
+    .execute();
 
   return (
     <View>
@@ -12,13 +15,11 @@ const Screen = () => {
 
       <FlatList
         data={ingredients}
-        keyExtractor={(item) => item._id.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => <Text>{`${item.name}`}</Text>}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default Screen;

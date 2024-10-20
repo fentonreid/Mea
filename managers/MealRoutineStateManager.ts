@@ -1,6 +1,6 @@
 import { MealRoutineState } from "@/models/enums/MealRoutineState";
-import { Users } from "@/models/schemas/Schemas";
-import { useQuery } from "@realm/react";
+import { MEAL_ROUTINES_TABLE } from "@/powersync/AppSchema";
+import { useSystem } from "@/powersync/PowerSync";
 import { router } from "expo-router";
 import { useEffect } from "react";
 
@@ -8,26 +8,36 @@ type Props = {
   ignoreCurrentMealRoutineState?: MealRoutineState[];
 };
 
-const MealRoutineStateManager = ({ ignoreCurrentMealRoutineState }: Props) => {
-  const loggedInUser = useQuery<Users>("Users")[0];
+const MealRoutineStateManager = async ({
+  ignoreCurrentMealRoutineState,
+}: Props) => {
+  const { supabaseConnector, db } = useSystem();
+  const { userId } = await supabaseConnector.fetchCredentials();
+
+  const mealRoutineState = await db
+    .selectFrom(MEAL_ROUTINES_TABLE)
+    .select("meal_routine_state")
+    .where("creator_id", "=", userId)
+    .where("start_date", ">=", "datetime('now', 'utc')")
+    .where("end_date", "<", "datetime('now', 'utc')")
+    .orderBy("start_date")
+    .executeTakeFirst();
 
   useEffect(() => {
-    const mealRoutineState =
-      loggedInUser.activeMealRoutineId === null
+    const state =
+      mealRoutineState === undefined
         ? MealRoutineState.ACTIVE_MEAL_ROUTINE_NULL
-        : (loggedInUser.activeMealRoutineId!
-            .mealRoutineState as MealRoutineState);
+        : (mealRoutineState.meal_routine_state as MealRoutineState);
 
     // If we are already on the meal routine state then ignore...
     if (
       !ignoreCurrentMealRoutineState ||
-      ignoreCurrentMealRoutineState!.includes(mealRoutineState) ||
-      loggedInUser.activeMealRoutineId === null
+      ignoreCurrentMealRoutineState!.includes(state)
     )
       return;
 
     // SWITCH on mealRoutineState and redirect to appropriate stack
-    switch (mealRoutineState) {
+    switch (state) {
       case MealRoutineState.ACTIVE_MEAL_ROUTINE_NULL:
       case MealRoutineState.SELECTING_DATE_RANGE:
         router.replace("mealroutine/states/1_selecting_date_range");
@@ -53,10 +63,10 @@ const MealRoutineStateManager = ({ ignoreCurrentMealRoutineState }: Props) => {
         router.replace("mealroutine/states/6_complete");
         break;
     }
-  }, [loggedInUser.activeMealRoutineId]);
+  }, [mealRoutineState?.meal_routine_state]);
 
-  if (loggedInUser.activeMealRoutineId !== null)
-    return loggedInUser.activeMealRoutineId;
+  if (mealRoutineState !== undefined)
+    return mealRoutineState.meal_routine_state;
 
   return null;
 };
